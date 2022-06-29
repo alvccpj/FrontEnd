@@ -37,7 +37,6 @@ const Courses = () => {
       toast.error(error.message);
     }
   };
-  const handleClose = () => setVisible(false);
 
   const actions = [
     {
@@ -81,7 +80,7 @@ const Courses = () => {
               title={`${course.id ? "Update" : "Create"} Course`}
               show={visible}
               handleSave={() => handleSave(refetch)}
-              handleClose={() => handleClose()}
+              handleClose={() => setVisible(false)}
             >
               <Form>
                 <Form.Group>

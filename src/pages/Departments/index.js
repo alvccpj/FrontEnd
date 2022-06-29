@@ -81,7 +81,7 @@ const Departments = () => {
               title={`${department.id ? "Update" : "Create"} Department`}
               show={visible}
               handleSave={() => handleSave(refetch)}
-              handleClose={() => handleClose()}
+              handleClose={() => setVisible(false)}
             >
               <Form>
                 <Form.Group>
