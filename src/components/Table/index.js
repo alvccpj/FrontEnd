@@ -29,7 +29,7 @@ const TableComponent = ({ actions, columns = [], items = [], refetch }) => {
               );
             })}
             {actions && (
-              <td>
+              <td key={`${index}+1`}>
                 <Dropdown>
                   <Dropdown.Toggle variant="secondary" id="dropdown-basic">
                     Actions
@@ -38,6 +38,7 @@ const TableComponent = ({ actions, columns = [], items = [], refetch }) => {
                   <Dropdown.Menu>
                     {actions.map((action) => (
                       <Dropdown.Item
+                        key={`actions-options-${index}`}
                         onClick={() => action.action(item, refetch)}
                       >
                         {action.name}

@@ -20,7 +20,7 @@ const columns = [
   },
 ];
 
-const INITIAL_STATE = { id: 0, name: "", cpf: "", department: 0 };
+const INITIAL_STATE = { id: 0, name: "", cpf: "", departmentId: 0 };
 
 const Professors = () => {
   const [visible, setVisible] = useState(false);
@@ -44,14 +44,119 @@ const Professors = () => {
     {
       name: "Edit",
       action: ({ id, name, cpf, department: { id: departmentId } }) => {
-        setProfessor({ id, name, cpf, department: { id: departmentId } });
+        setProfessor({ id, name, cpf, departmentId });
         setVisible(true);
       },
     },
     {
       name: "Remove",
+      action: async (professor, refetch) => {
+        if (window.confirm("Você tem certeza disso?")) {
+          try {
+            await api.delete(`${endpoint}/${professor.id}`);
+            await refetch();
+            toast.info(`Professor(a) ${professor.name} foi removido(a)!`);
+          } catch (error) {
+            toast.info(error.message);
+          }
+        }
+      },
     },
   ];
+
+  const handleSave = async (refetch) => {
+    const data = {
+      name: professor.name,
+      cpf: professor.cpf,
+      departmentId: professor.departmentId,
+    };
+    try {
+      if (professor.id) {
+        await api.put(`${endpoint}/${professor.id}`, data);
+
+        toast.success("Atualizado com sucesso!");
+      } else {
+        await api.post(endpoint, data);
+
+        toast.success("Professor(a) foi cadastrado(a) com sucesso!");
+      }
+      setVisible(false);
+      await refetch();
+    } catch (error) {
+      toast.error(error.message);
+    }
+  };
+
+  // função genérica que pode ser reutilizada por todos os inpúts do modal do professor
+  const onChange = ({ target: { name, value } }) => {
+    setProfessor({
+      ...professor,
+      [name]: value,
+    });
+  };
+
+  return (
+    <Page title="Professors">
+      <Button
+        className="mb-2"
+        onClick={() => {
+          setProfessor(INITIAL_STATE);
+          setVisible(true);
+        }}
+      >
+        Create Professor
+      </Button>
+      <ListView actions={actions} columns={columns} endpoint={endpoint}>
+        {({ refetch }) => {
+          return (
+            <Modal
+              title={`${professor.id ? "Update" : "Create"} Professor`}
+              show={visible}
+              handleSave={() => handleSave(refetch)}
+              handleClose={() => setVisible(false)}
+            >
+              <Form>
+                <Form.Group>
+                  <Form.Label>Professor Name</Form.Label>
+                  <Form.Control
+                    name="name"
+                    onChange={onChange}
+                    value={professor.name}
+                  />
+                </Form.Group>
+                <Form.Group className="mt-4">
+                  <Form.Label>Professor CPF</Form.Label>
+                  <Form.Control
+                    name="cpf"
+                    onChange={onChange}
+                    value={professor.cpf}
+                  />
+                </Form.Group>
+                <Form.Group className="mt-4">
+                  <Form.Label>Department</Form.Label>
+                  <select
+                    className="form-control"
+                    name="departmentId"
+                    onChange={onChange}
+                    value={professor.departmentId}
+                  >
+                    <option>Select one department</option>
+                    {departments.map((department, index) => {
+                      return (
+                        <option key={index} value={department.id}>
+                          {department.name}
+                        </option>
+                      );
+                    })}
+                  </select>
+                </Form.Group>
+              </Form>
+            </Modal>
+          );
+        }}
+      </ListView>
+    </Page>
+  );
 };
 
 export default Professors;
