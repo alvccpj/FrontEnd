@@ -136,6 +136,13 @@ const Allocations = () => {
   ];
 
   const handleSave = async (refetch) => {
+    const data = {
+      courseId: Number(allocation.courseId),
+      dayOfWeek: allocation.dayOfWeek,
+      endHour: allocation.endHour + "+0000",
+      professorId: Number(allocation.professorId),
+      startHour: allocation.startHour + "+0000",
+    };
     try {
       if (allocation.id) {
         await api.put(`${endpoint}/${allocation.id}`, data);
